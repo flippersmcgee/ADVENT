@@ -12,15 +12,12 @@ class BaseDataset(data.Dataset):
         self.set = set_
         self.list_path = list_path.format(self.set)
         self.image_size = image_size
-        if labels_size is None:
-            self.labels_size = self.image_size
-        else:
-            self.labels_size = labels_size
+        self.labels_size = self.image_size if labels_size is None else labels_size
         self.mean = mean
         with open(self.list_path) as f:
             self.img_ids = [i_id.strip() for i_id in f]
         if max_iters is not None:
-            self.img_ids = self.img_ids * int(np.ceil(float(max_iters) / len(self.img_ids)))
+            self.img_ids *= int(np.ceil(float(max_iters) / len(self.img_ids)))
         self.files = []
         for name in self.img_ids:
             img_file, label_file = self.get_metadata(name)

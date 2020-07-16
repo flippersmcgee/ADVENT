@@ -9,7 +9,7 @@ palette = [128, 64, 128, 244, 35, 232, 70, 70, 70, 102, 102, 156,
            142, 0, 0, 70,
            0, 60, 100, 0, 80, 100, 0, 0, 230, 119, 11, 32]
 zero_pad = 256 * 3 - len(palette)
-for i in range(zero_pad):
+for _ in range(zero_pad):
     palette.append(0)
 
 

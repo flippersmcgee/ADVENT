@@ -314,9 +314,11 @@ def train_minent(model, trainloader, targetloader, cfg):
 
 
 def print_losses(current_losses, i_iter):
-    list_strings = []
-    for loss_name, loss_value in current_losses.items():
-        list_strings.append(f'{loss_name} = {to_numpy(loss_value):.3f} ')
+    list_strings = [
+        f'{loss_name} = {to_numpy(loss_value):.3f} '
+        for loss_name, loss_value in current_losses.items()
+    ]
+
     full_string = ' '.join(list_strings)
     tqdm.write(f'iter = {i_iter} {full_string}')
 
