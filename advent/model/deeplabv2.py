@@ -103,11 +103,18 @@ class ResNetMulti(nn.Module):
                 nn.BatchNorm2d(planes * block.expansion, affine=affine_par))
         for i in downsample._modules['1'].parameters():
             i.requires_grad = False
-        layers = []
-        layers.append(
-            block(self.inplanes, planes, stride, dilation=dilation, downsample=downsample))
+        layers = [
+            block(
+                self.inplanes,
+                planes,
+                stride,
+                dilation=dilation,
+                downsample=downsample,
+            )
+        ]
+
         self.inplanes = planes * block.expansion
-        for i in range(1, blocks):
+        for _ in range(1, blocks):
             layers.append(block(self.inplanes, planes, dilation=dilation))
 
         return nn.Sequential(*layers)
@@ -135,17 +142,10 @@ class ResNetMulti(nn.Module):
         requires_grad is set to False in deeplab_resnet.py, therefore this function does not return
         any batchnorm parameter
         """
-        b = []
+        b = [self.conv1, self.bn1, self.layer1, self.layer2, self.layer3, self.layer4]
 
-        b.append(self.conv1)
-        b.append(self.bn1)
-        b.append(self.layer1)
-        b.append(self.layer2)
-        b.append(self.layer3)
-        b.append(self.layer4)
-
-        for i in range(len(b)):
-            for j in b[i].modules():
+        for item in b:
+            for j in item.modules():
                 jj = 0
                 for k in j.parameters():
                     jj += 1
@@ -162,9 +162,8 @@ class ResNetMulti(nn.Module):
             b.append(self.layer5.parameters())
         b.append(self.layer6.parameters())
 
-        for j in range(len(b)):
-            for i in b[j]:
-                yield i
+        for item in b:
+            yield from item
 
     def optim_parameters(self, lr):
         return [{'params': self.get_1x_lr_params_no_scale(), 'lr': lr},
@@ -172,5 +171,4 @@ class ResNetMulti(nn.Module):
 
 
 def get_deeplab_v2(num_classes=19, multi_level=True):
-    model = ResNetMulti(Bottleneck, [3, 4, 23, 3], num_classes, multi_level)
-    return model
+    return ResNetMulti(Bottleneck, [3, 4, 23, 3], num_classes, multi_level)
